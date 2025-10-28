@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Приобретение Монет</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #ffffff;
+      --muted: #9aa0a6;
+      --card-bg: #f5f5f6;
+      --accent: #ef4444;
+      --accent-soft: rgba(239,68,68,0.08);
+      --border: #e6e8ea;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      display:flex;
+      justify-content:center;
+      padding:16px 12px;
+      min-height: 100vh;
+    }
+
+    .container{
+      width:100%;
+      max-width:420px;
+    }
+
+    h1{
+      font-size:18px;
+      font-weight:600;
+      margin:0 0 14px 0;
+      color:#111827;
+      text-align:left;
+    }
+
+    .balance-box{
+      background:var(--card-bg);
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:12px;
+      border:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .balance-label{
+      color:#374151;
+      font-size:14px;
+    }
+
+    .balance-value{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-weight:600;
+      font-size:15px;
+      color:#111827;
+    }
+
+    .coin-img{
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    .username-input{
+      width:100%;
+      border:1px solid var(--border);
+      background:var(--card-bg);
+      border-radius:12px;
+      padding:14px 16px;
+      font-size:16px;
+      outline:none;
+      margin-bottom:16px;
+      transition:border 0.2s ease;
+    }
+    .username-input:focus{
+      border-color:var(--accent);
+      background:white;
+    }
+
+    .section-title{
+      color:var(--muted);
+      font-size:13px;
+      margin:0 0 8px 0;
+    }
+
+    .packs-grid{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:10px;
+    }
+
+    @media (min-width: 375px) {
+      .packs-grid{
+        grid-template-columns:repeat(3, 1fr);
+      }
+    }
+
+    .pack{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px 8px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:all 180ms ease;
+      min-height:80px;
+      position: relative;
+    }
+
+    .pack .coin{
+      width:30px;
+      height:30px;
+      margin-bottom:6px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    .pack .coins-count{
+      font-weight:600;
+      font-size:14px;
+      color:#111827;
+      text-align:center;
+    }
+
+    .pack .price{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+      text-align:center;
+    }
+
+    .pack.selected{
+      border-color:var(--accent);
+      background:var(--accent-soft);
+      box-shadow:0 0 0 3px rgba(239,68,68,0.04);
+    }
+
+    .buy-wrap{
+      margin-top:20px;
+      position:sticky;
+      bottom:10px;
+    }
+
+    .buy-btn{
+      width:100%;
+      background:linear-gradient(180deg,var(--accent),#dc2626);
+      color:white;
+      border:none;
+      padding:18px;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:0 4px 12px rgba(220,38,38,0.18);
+      transition:transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    .buy-btn:active{
+      transform:translateY(1px);
+      box-shadow:0 2px 8px rgba(220,38,38,0.18);
+    }
+
+    .order-summary {
+      display: none;
+    }
+
+    .order-details {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .order-row:last-child {
+      border-bottom: none;
+    }
+
+    .order-label {
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .order-value {
+      font-weight: 600;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    .back-btn {
+      width: 100%;
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all 120ms ease;
+    }
+
+    .back-btn:active {
+      background: var(--accent-soft);
+    }
+
+    .confirm-btn {
+      width: 100%;
+      background: linear-gradient(180deg,var(--accent),#dc2626);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(220,38,38,0.18);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    .confirm-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(220,38,38,0.18);
+    }
+
+    .payment-methods {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 375px) {
+      .payment-methods {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .payment-method {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 180ms ease;
+      min-height: 70px;
+      position: relative;
+    }
+
+    .payment-method.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.04);
+    }
+
+    .payment-method img {
+      width: 42px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .payment-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .loader-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+      min-height: 60vh;
+    }
+
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--accent-soft);
+      border-top: 3px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    .loader-text {
+      color: var(--muted);
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .success-page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 16px;
+      text-align: center;
+      min-height: 80vh;
+    }
+
+    .success-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .success-details {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 18px;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+      width: 100%;
+    }
+
+    .success-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .success-row:last-child {
+      border-bottom: none;
+    }
+
+    .success-label {
+      color: #374151;
+      font-size: 13px;
+    }
+
+    .success-value {
+      font-weight: 600;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .done-btn {
+      width: 100%;
+      background: linear-gradient(180deg,var(--accent),#dc2626);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(220,38,38,0.18);
+      margin-top: 16px;
+    }
+
+    .done-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(220,38,38,0.18);
+    }
+
+    .success-check {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #10b9811a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .checkmark {
+      width: 40px;
+      height: 40px;
+      position: relative;
+    }
+
+    .checkmark::after {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 12px;
+      width: 16px;
+      height: 24px;
+      border-right: 3px solid #10b981;
+      border-bottom: 3px solid #10b981;
+      transform: rotate(45deg);
+    }
+
+    .pack-loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .pack-loading::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+    }
+
+    .pack-loading::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 18px;
+      height: 18px;
+      margin: -9px 0 0 -9px;
+      border: 2px solid var(--accent-soft);
+      border-top: 2px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      z-index: 2;
+    }
+
+    .payment-loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .payment-loading::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+    }
+
+    .payment-loading::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 18px;
+      height: 18px;
+      margin: -9px 0 0 -9px;
+      border: 2px solid var(--accent-soft);
+      border-top: 2px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      z-index: 2;
+    }
+
+    /* Улучшения для очень маленьких экранов */
+    @media (max-width: 320px) {
+      body {
+        padding: 12px 8px;
+      }
+      
+      .packs-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      
+      .pack {
+        padding: 10px 6px;
+        min-height: 70px;
+      }
+      
+      .pack .coin {
+        width: 26px;
+        height: 26px;
+      }
+      
+      .pack .coins-count {
+        font-size: 13px;
+      }
+      
+      .pack .price {
+        font-size: 11px;
+      }
+    }
+
+    /* Улучшения для планшетов и больших экранов */
+    @media (min-width: 768px) {
+      body {
+        padding: 24px;
+      }
+      
+      .container {
+        max-width: 480px;
+      }
+      
+      .packs-grid {
+        gap: 12px;
+      }
+      
+      .pack {
+        padding: 14px 10px;
+        min-height: 90px;
+      }
+    }
+
+    /* Предотвращение масштабирования при фокусе на iOS */
+    @media (max-width: 768px) {
+      .username-input {
+        font-size: 16px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container selection-page">
+    <h1>Приобретение Монет</h1>
+    <div class="balance-box">
+      <div class="balance-label">Баланс</div>
+      <div class="balance-value">
+        <img src="img/e0b810e57ba3977744f9cfc8fab7975a.jpg" alt="coin" class="coin-img">
+        <span>127.951.657</span>
+      </div>
+    </div>
+    <input id="username" type="text" class="username-input" placeholder="Введите тег получателя">
+    <div>
+      <p class="section-title">Пополнение</p>
+      <div id="packs" class="packs-grid"></div>
+    </div>
+    <div class="buy-wrap">
+      <button id="buyBtn" class="buy-btn">Пополнение</button>
+    </div>
+  </div>
+
+  <div class="container loader-container" id="loader1">
+    <div class="loader"></div>
+    <div class="loader-text">Обрабатываем ваш выбор...</div>
+  </div>
+
+  <div class="container order-summary">
+    <h1>Подтверждение заказа</h1>
+    <div class="order-details">
+      <div class="order-row">
+        <div class="order-label">Получатель</div>
+        <div class="order-value" id="order-username"></div>
+      </div>
+      <div class="order-row">
+        <div class="order-label">Пакет монет</div>
+        <div class="order-value">
+          <img src="img/e0b810e57ba3977744f9cfc8fab7975a.jpg" alt="coin" class="coin-img">
+          <span id="order-coins"></span>
+        </div>
+      </div>
+      <div class="order-row">
+        <div class="order-label">Стоимость</div>
+        <div class="order-value" id="order-price"></div>
+      </div>
+    </div>
+    <div>
+      <p class="section-title">Способ оплаты</p>
+      <div class="payment-methods">
+        <div class="payment-method" data-method="visa">
+          <img src="img/png-clipart-visa-logo-credit-card-american-express-jcb-co-ltd-visa-blue-text-thumbnail.png" alt="Visa">
+          <div class="payment-label">**** **** **** 6136</div>
+        </div>
+        <div class="payment-method" data-method="mastercard">
+          <img src="img/Mastercard-Logo.wine.png" alt="Mastercard">
+          <div class="payment-label">Mastercard</div>
+        </div>
+      </div>
+    </div>
+    <div class="buy-wrap">
+      <button id="backBtn" class="back-btn">Назад</button>
+      <button id="confirmBtn" class="confirm-btn">Подтвердить покупку</button>
+    </div>
+  </div>
+
+  <div class="container loader-container" id="loader2">
+    <div class="loader"></div>
+    <div class="loader-text" id="loader2Text">Получаем карту...</div>
+  </div>
+
+  <div class="container success-page">
+    <div class="success-check">
+      <div class="checkmark"></div>
+    </div>
+    <div class="success-title">Покупка успешно завершена!</div>
+    <div class="success-details">
+      <div class="success-row">
+        <div class="success-label">Получатель</div>
+        <div class="success-value" id="success-username"></div>
+      </div>
+      <div class="success-row">
+        <div class="success-label">Пакет монет</div>
+        <div class="success-value">
+          <img src="img/e0b810e57ba3977744f9cfc8fab7975a.jpg" alt="coin" class="coin-img">
+          <span id="success-coins"></span>
+        </div>
+      </div>
+      <div class="success-row">
+        <div class="success-label">Стоимость</div>
+        <div class="success-value" id="success-price"></div>
+      </div>
+      <div class="success-row">
+        <div class="success-label">Способ оплаты</div>
+        <div class="success-value" id="success-payment"></div>
+      </div>
+      <div class="success-row">
+        <div class="success-label">Статус</div>
+        <div class="success-value" style="color: #10b981;">Успешно</div>
+      </div>
+    </div>
+    <button id="doneBtn" class="done-btn">Готово</button>
+  </div>
+
+  <script>
+    const packs = [
+      { coins: 20, price: 0.39 },
+      { coins: 70, price: 1.29 },
+      { coins: 350, price: 6.0 },
+      { coins: 700, price: 12.0 },
+      { coins: 1400, price: 24.0 },
+      { coins: 3500, price: 60.0 },
+      { coins: 7000, price: 120.99 },
+      { coins: 17500, price: 300.0 },
+    ];
+
+    let selected = packs[0].coins;
+    let selectedPaymentMethod = null;
+    const packsContainer = document.getElementById("packs");
+    const selectionPage = document.querySelector('.selection-page');
+    const orderSummary = document.querySelector('.order-summary');
+    const loader1 = document.getElementById('loader1');
+    const loader2 = document.getElementById('loader2');
+    const loader2Text = document.getElementById('loader2Text');
+    const successPage = document.querySelector('.success-page');
+    const paymentMethods = document.querySelectorAll('.payment-method');
+
+    function formatPrice(p) {
+      return p.toFixed(2) + " $";
+    }
+
+    function createPackElement(pack) {
+      const el = document.createElement("div");
+      el.className = "pack";
+      if (pack.coins === selected) el.classList.add("selected");
+      el.innerHTML = `
+        <img src="img/e0b810e57ba3977744f9cfc8fab7975a.jpg" alt="coin" class="coin">
+        <div class="coins-count">${pack.coins}</div>
+        <div class="price">${formatPrice(pack.price)}</div>
+      `;
+      el.addEventListener("click", () => {
+        el.classList.add("pack-loading");
+        
+        setTimeout(() => {
+          selected = pack.coins;
+          document.querySelectorAll(".pack").forEach(p => {
+            p.classList.remove("selected");
+            p.classList.remove("pack-loading");
+          });
+          el.classList.add("selected");
+        }, 300);
+      });
+      return el;
+    }
+
+    packs.forEach(pack => packsContainer.appendChild(createPackElement(pack)));
+
+    paymentMethods.forEach(method => {
+      method.addEventListener('click', () => {
+        method.classList.add("payment-loading");
+        
+        setTimeout(() => {
+          paymentMethods.forEach(m => {
+            m.classList.remove('selected');
+            m.classList.remove("payment-loading");
+          });
+          method.classList.add('selected');
+          selectedPaymentMethod = method.dataset.method;
+        }, 500);
+      });
+    });
+
+    document.getElementById("buyBtn").addEventListener("click", () => {
+      const username = document.getElementById("username").value.trim();
+      if (!username) {
+        alert("Введите тег получателя перед покупкой!");
+        return;
+      }
+
+      selectionPage.style.display = "none";
+      loader1.style.display = "flex";
+
+      setTimeout(() => {
+        loader1.style.display = "none";
+        orderSummary.style.display = "block";
+
+        const selectedPack = packs.find(p => p.coins === selected);
+        document.getElementById("order-username").textContent = username;
+        document.getElementById("order-coins").textContent = selectedPack.coins;
+        document.getElementById("order-price").textContent = formatPrice(selectedPack.price);
+      }, 1500);
+    });
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      orderSummary.style.display = "none";
+      selectionPage.style.display = "block";
+    });
+
+    document.getElementById("confirmBtn").addEventListener("click", () => {
+      if (!selectedPaymentMethod) {
+        alert("Пожалуйста, выберите способ оплаты!");
+        return;
+      }
+
+      orderSummary.style.display = "none";
+      loader2.style.display = "flex";
+      loader2Text.textContent = "Получаем карту...";
+
+      setTimeout(() => {
+        loader2Text.textContent = "Обрабатываем платёж...";
+
+        setTimeout(() => {
+          loader2.innerHTML = `
+            <div class="success-check">
+              <div class="checkmark"></div>
+            </div>
+            <div class="loader-text" style="color:#10b981;font-weight:600;">Готово!</div>
+          `;
+
+          setTimeout(() => {
+            loader2.style.display = "none";
+            loader2.innerHTML = `
+              <div class="loader"></div>
+              <div class="loader-text" id="loader2Text">Получаем карту...</div>
+            `;
+
+            successPage.style.display = "flex";
+
+            const selectedPack = packs.find(p => p.coins === selected);
+            const username = document.getElementById("username").value.trim();
+            document.getElementById("success-username").textContent = username;
+            document.getElementById("success-coins").textContent = selectedPack.coins;
+            document.getElementById("success-price").textContent = formatPrice(selectedPack.price);
+            document.getElementById("success-payment").textContent =
+              selectedPaymentMethod === "visa" ? "Visa" : "Mastercard";
+          }, 1000);
+        }, 2000);
+      }, 2000);
+    });
+
+    document.getElementById("doneBtn").addEventListener("click", () => {
+      successPage.style.display = "none";
+      selectionPage.style.display = "block";
+      document.getElementById("username").value = "";
+      paymentMethods.forEach(m => m.classList.remove("selected"));
+      selectedPaymentMethod = null;
+    });
+  </script>
+</body>
+</html>
